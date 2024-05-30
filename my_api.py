@@ -15,13 +15,13 @@ async def users():
     return user_list
 
 @app.get("/users/listfilter", response_model=List[User])
-def get_users_by_ids(user_ids: List[int] = Query(...)):
+async def get_users_by_ids(user_ids: List[int] = Query(...)):
     
     filtered_users = user_filter(filter_type="list", user_ids=user_ids)
     return filtered_users
 
 @app.get("/users/rangefilter", response_model=List[User])
-def get_users_by_range(start_id: int, end_id: int):
+async def get_users_by_range(start_id: int, end_id: int):
     
     filtered_users = user_filter(filter_type="range", start_id=start_id, end_id=end_id)
     return filtered_users
@@ -40,7 +40,7 @@ async def create_user(user: User):
 
 # PUT method to update user details
 @app.put("/users/{user_id}", response_model=User)
-def update_user(user_id: int, user_data: dict):
+async def update_user(user_id: int, user_data: dict):
     for user in user_list:
         if user.id == user_id:
             for key, value in user_data.items():
@@ -52,7 +52,7 @@ def update_user(user_id: int, user_data: dict):
 
 # DELETE method to erase users from user_db
 @app.delete("/users")
-def delete_users(user_ids: List[int] = Query(...)):
+async def delete_users(user_ids: List[int] = Query(...)):
     deleted_users = []
     for user_id in user_ids:
         for user in user_list:
