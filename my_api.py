@@ -1,4 +1,4 @@
-from fastapi import FastAPI, HTTPException, Query
+from fastapi import FastAPI, HTTPException, Query, Body
 from typing import List, Optional
 from user_db import User, user_list
 
@@ -34,3 +34,15 @@ def get_users_by_range(start_id: int, end_id: int):
         raise HTTPException(status_code=404, detail="No users found within the provided range")
     
     return filtered_users
+
+# Endpoint to add new users to the user_db file
+@app.post("/new_user", response_model=User)
+async def create_user(user: User):
+    # Generate a new ID for the new user
+    new_user_id = max(user.id for user in user_list) + 1 if user_list else 1
+    user.id = new_user_id
+    
+    # Add the new user to user_list
+    user_list.append(user)
+    
+    return user
