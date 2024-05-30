@@ -26,7 +26,7 @@ def get_users_by_range(start_id: int, end_id: int):
     filtered_users = user_filter(filter_type="range", start_id=start_id, end_id=end_id)
     return filtered_users
 
-# Endpoint to add new users to the user_db file
+# Method to add new users to the user_db file
 @app.post("/new_user", response_model=User)
 async def create_user(user: User):
     # Generate a new ID for the new user
@@ -37,3 +37,15 @@ async def create_user(user: User):
     user_list.append(user)
     
     return user
+
+# PUT method to update user details
+@app.put("/users/{user_id}", response_model=User)
+def update_user(user_id: int, user_data: dict):
+    for user in user_list:
+        if user.id == user_id:
+            for key, value in user_data.items():
+                setattr(user, key, value)
+            return user
+    
+    # If user_id not found, raise HTTPException with 404 Not Found
+    raise HTTPException(status_code=404, detail="User not found")

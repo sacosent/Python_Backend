@@ -16,7 +16,7 @@ user_list: List[User] = [
             User(id=5, name="Eve", age=28, email="eve@example.com"),
             User(id=6, name="Frank", age=33, email="frank@example.com"),
             User(id=7, name="Grace", age=27, email="grace@example.com"),
-            User(id=8,name="Chavito", age=34, email="elchavito@example.com")
+            User(id=8,name="Tester", age=34, email="test@example.com")
                         ]
 
 
