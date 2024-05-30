@@ -1,3 +1,4 @@
+from http.client import HTTPException
 from pydantic import BaseModel
 from typing import List, Optional
 
@@ -17,3 +18,22 @@ user_list: List[User] = [
             User(id=7, name="Grace", age=27, email="grace@example.com"),
             User(id=8,name="Chavito", age=34, email="elchavito@example.com")
                         ]
+
+
+def user_filter(filter_type: str, user_ids: List[int] = None, start_id: int = None, end_id: int = None):
+    
+    if filter_type == "list" and user_ids is not None:
+        filtered_users = [user for user in user_list if user.id in user_ids]
+        error_message = "No users found with the provided IDs"
+
+    elif filter_type == "range" and start_id is not None and end_id is not None:
+        filtered_users = [user for user in user_list if start_id <= user.id <= end_id]
+        error_message = "No users found within the provided range"
+        
+    else:
+        raise HTTPException(status_code=400, detail="Invalid filter type or missing parameters")
+    
+    if not filtered_users:
+            raise HTTPException(status_code=404, detail=error_message)
+    return filtered_users
+
