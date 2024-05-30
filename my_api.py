@@ -1,4 +1,4 @@
-from fastapi import FastAPI, HTTPException, Query, Body
+from fastapi import FastAPI, HTTPException, Query
 from typing import List, Optional
 from user_db import User, user_list, user_filter
 
@@ -48,4 +48,20 @@ def update_user(user_id: int, user_data: dict):
             return user
     
     # If user_id not found, raise HTTPException with 404 Not Found
-    raise HTTPException(status_code=404, detail="User not found")
+    raise HTTPException(status_code=404, detail="User not found. No Update made")
+
+# DELETE method to erase users from user_db
+@app.delete("/users")
+def delete_users(user_ids: List[int] = Query(...)):
+    deleted_users = []
+    for user_id in user_ids:
+        for user in user_list:
+            if user.id == user_id:
+                user_list.remove(user)
+                deleted_users.append(user)
+                break
+    
+    if not deleted_users:
+        raise HTTPException(status_code=404, detail="No users found with the provided IDs")
+    
+    return {"message": "Users deleted successfully", "deleted_users": deleted_users}
