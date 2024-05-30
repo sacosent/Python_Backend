@@ -1,9 +1,4 @@
-from fastapi import FastAPI
-from typing import List
-from user_db import User, users
+if __name__ == "__main__":
+    import uvicorn
+    uvicorn.run("my_api:app", host="127.0.0.1", port=8000, reload=True)
 
-app = FastAPI()
-
-@app.get("/users", response_model=List[User])
-def get_users():
-    return users
