@@ -27,7 +27,7 @@ async def get_users_by_range(start_id: int, end_id: int):
     return filtered_users
 
 # Method to add new users to the user_db file
-@app.post("/new_user", response_model=User)
+@app.post("/new_user", response_model=User,status_code=201)
 async def create_user(user: User):
     # Generate a new ID for the new user
     new_user_id = max(user.id for user in user_list) + 1 if user_list else 1
