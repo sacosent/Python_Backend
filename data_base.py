@@ -19,6 +19,7 @@ user_list: List[User] = [
             User(id=8,name="Tester", age=34, email="test@example.com")
                         ]
 
+product_list: List = ["Product 1","Product 2"]
 
 def user_filter(filter_type: str, user_ids: List[int] = None, start_id: int = None, end_id: int = None):
     
