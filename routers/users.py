@@ -1,33 +1,29 @@
-from fastapi import FastAPI, HTTPException, Query
-from typing import List, Optional
-from user_db import User, user_list, user_filter
+from fastapi import APIRouter, HTTPException, Query
+from typing import List
+from data_base import User, user_list, user_filter
 
-app = FastAPI()
+router = APIRouter(prefix="/users")
 
 #--------------------- USER LOGIN ---------------------#
 
-@app.get("/")
-async def root():
-    return {"Hello": "World"}
-
-@app.get("/users", response_model=List[User])
+@router.get("/", response_model=List[User])
 async def users():
     return user_list
 
-@app.get("/users/listfilter", response_model=List[User])
+@router.get("/listfilter", response_model=List[User])
 async def get_users_by_ids(user_ids: List[int] = Query(...)):
     
     filtered_users = user_filter(filter_type="list", user_ids=user_ids)
     return filtered_users
 
-@app.get("/users/rangefilter", response_model=List[User])
+@router.get("/rangefilter", response_model=List[User])
 async def get_users_by_range(start_id: int, end_id: int):
     
     filtered_users = user_filter(filter_type="range", start_id=start_id, end_id=end_id)
     return filtered_users
 
-# Method to add new users to the user_db file
-@app.post("/new_user", response_model=User,status_code=201)
+# Method to add new users to the data_base file
+@router.post("/", response_model=User,status_code=201)
 async def create_user(user: User):
     # Generate a new ID for the new user
     new_user_id = max(user.id for user in user_list) + 1 if user_list else 1
@@ -39,7 +35,7 @@ async def create_user(user: User):
     return user
 
 # PUT method to update user details
-@app.put("/users/{user_id}", response_model=User)
+@router.put("/{user_id}", response_model=User)
 async def update_user(user_id: int, user_data: dict):
     for user in user_list:
         if user.id == user_id:
@@ -51,7 +47,7 @@ async def update_user(user_id: int, user_data: dict):
     raise HTTPException(status_code=404, detail="User not found. No Update made")
 
 # DELETE method to erase users from user_db
-@app.delete("/users")
+@router.delete("/")
 async def delete_users(user_ids: List[int] = Query(...)):
     deleted_users = []
     for user_id in user_ids:
