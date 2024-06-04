@@ -2,7 +2,7 @@ from fastapi import APIRouter, HTTPException, Query
 from typing import List
 from data_base import User, user_list, user_filter
 
-router = APIRouter(prefix="/users")
+router = APIRouter(prefix="/users",tags=["Users"])
 
 #--------------------- USER LOGIN ---------------------#
 

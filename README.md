@@ -6,4 +6,4 @@
 
 .
 #### Make sure to first run the following command to start your local server:
-uvicorn my_api:app --reload
+uvicorn main:app --reload
