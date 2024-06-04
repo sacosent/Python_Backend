@@ -11,7 +11,7 @@ from pydantic import BaseModel
 # To get a string like this run: openssl rand -hex 32
 SECRET_KEY = "3ce18cafa4cc494ff6247dd26a51e44a59650b486bf48663d13a0c56c0cf6e3a"
 ALGORITHM = "HS256"
-ACCESS_TOKEN_EXPIRE_MINUTES = 1
+ACCESS_TOKEN_EXPIRE_MINUTES = 45
 
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
@@ -38,6 +38,7 @@ users_db = {
 
 class Token(BaseModel):
     access_token: str
+    expiration: datetime
     token_type: str
 
 
@@ -96,6 +97,11 @@ async def get_current_user(token: Annotated[str, Depends(oauth2_scheme)]):
         detail="Could not validate credentials",
         headers={"WWW-Authenticate": "Bearer"},
     )
+    token_expiration = HTTPException(
+        status_code=status.HTTP_401_UNAUTHORIZED,
+        detail="Token Expired",
+        headers={"WWW-Authenticate": "Bearer"},
+    )
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
         username: str = payload.get("sub")
@@ -103,7 +109,7 @@ async def get_current_user(token: Annotated[str, Depends(oauth2_scheme)]):
             raise credentials_exception
         token_data = TokenData(username=username)
     except InvalidTokenError:
-        raise credentials_exception
+        raise token_expiration
     user = get_user(users_db, username=token_data.username)
     if user is None:
         raise credentials_exception
@@ -129,11 +135,14 @@ async def login_for_access_token(
             detail="Incorrect username or password",
             headers={"WWW-Authenticate": "Bearer"},
         )
+    
     access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
+    token_expiration_datetime = datetime.now(timezone.utc) + access_token_expires
+
     access_token = create_access_token(
         data={"sub": user.username}, expires_delta=access_token_expires
     )
-    return Token(access_token=access_token, token_type="bearer")
+    return Token(access_token=access_token, expiration=token_expiration_datetime, token_type="bearer")
 
 
 @router.get("/users/me/", response_model=User)
