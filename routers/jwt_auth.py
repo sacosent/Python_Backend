@@ -9,9 +9,9 @@ from passlib.context import CryptContext
 from pydantic import BaseModel
 
 # To get a string like this run: openssl rand -hex 32
-SECRET_KEY = "09d25e094faa6ca2556c818166b7a9563b93f7099f6f0f4caa6cf63b88e8d3e7"
+SECRET_KEY = "3ce18cafa4cc494ff6247dd26a51e44a59650b486bf48663d13a0c56c0cf6e3a"
 ALGORITHM = "HS256"
-ACCESS_TOKEN_EXPIRE_MINUTES = 30
+ACCESS_TOKEN_EXPIRE_MINUTES = 1
 
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
@@ -23,14 +23,14 @@ users_db = {
         "username": "johndoe",
         "full_name": "John Doe",
         "email": "johndoe@example.com",
-        "hashed_password": "$2a$12$3lIujQexqNavt38aED6rmOGlE5UJijoQD99t0CfUb6XznVPh8u3Ru",
+        "hashed_password": "$2a$12$4fr9rCOmXpV0wKcjpD2zautlYCFpH2eXFBotqhUaHK5G/WKaBKVrW", # Coty1907
         "disabled": False,
     },
     "sacosent": {
         "username": "sacosent",
         "full_name": "Santiago Cosentino",
         "email": "sacosent@example.com",
-        "hashed_password": "$2a$12$pUmoRQhktyYoOXgM8lW9uu61cJBHVvdQx2WdpZJT7aTSHfd7UA7h6",
+        "hashed_password": "$2a$12$pUmoRQhktyYoOXgM8lW9uu61cJBHVvdQx2WdpZJT7aTSHfd7UA7h6", # Ruka1711
         "disabled": False,
     }
 }
