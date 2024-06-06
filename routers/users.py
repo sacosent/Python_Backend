@@ -2,7 +2,7 @@ from fastapi import APIRouter, HTTPException, status, Query
 from typing import List
 from database.models.user import User
 from database.schemas.user import user_schema, users_schema
-from database.db_connection import dbclient
+from database.atlas_server import dbclient
 from bson import ObjectId
 
 router = APIRouter(prefix="/users",tags=["Users"])
