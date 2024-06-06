@@ -1,19 +1,30 @@
-## Access API Documentation
+# Access API Documentation
+Asegúrese de ejecutar primero el siguiente comando para iniciar su servidor local:
+```py
+uvicorn main:app --reload
+```
 
-- **Swagger Documentation**: http://127.0.0.1:8000/docs
-- **ReDoc Documentation**: http://127.0.0.1:8000/redoc
-- **OpenAPI Schema**: http://127.0.0.1:8000/openapi.json
+- [Swagger Documentation](http://127.0.0.1:8000/docs)
+- [ReDoc Documentation](http://127.0.0.1:8000/redoc)
+- [OpenAPI Schema](http://127.0.0.1:8000/openapi.json)
 
-# Descarga versión community: https://www.mongodb.com/try/download
-# Instalación:https://www.mongodb.com/docs/manual/tutorial
-# Módulo conexión MongoDB: pip install pymongo
-# Ejecución: sudo mongod --dbpath "/path/a/la/base/de/datos/"
-# Conexión: mongodb://localhost
+# MongoDB
+
+- [Descarga versión community](https://www.mongodb.com/try/download)
+- [Instalación](https://www.mongodb.com/docs/manual/tutorial)
+
+### Módulo conexión MongoDB
+```cmd
+ pip install pymongo
+```
+
+### Iniciar servidor local (conexión: mongodb://localhost)
+```cmd
+cd "C:\Program Files\MongoDB\Server\7.0\bin>"
+mongod
+```
 
 # Despliegue API en la nube:
-# Deta - https://www.deta.sh/
-# Intrucciones - https://fastapi.tiangolo.com/deployment/deta/
 
-.
-#### Make sure to first run the following command to start your local server:
-uvicorn main:app --reload
+- [Deta](https://www.deta.sh/)
+- [Intrucciones](https://fastapi.tiangolo.com/deployment/deta/)
