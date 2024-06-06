@@ -1,63 +1,73 @@
-from fastapi import APIRouter, HTTPException, Query
+from fastapi import APIRouter, HTTPException, status, Query
 from typing import List
-from data_base import User, user_list, user_filter
+from database.models.user import User
+from database.schemas.user import user_schema, users_schema
+from database.db_connection import dbclient
+from bson import ObjectId
 
 router = APIRouter(prefix="/users",tags=["Users"])
 
-#--------------------- USER LOGIN ---------------------#
+#--------------------- METHODS ---------------------#
 
 @router.get("/", response_model=List[User])
 async def users():
-    return user_list
+    return users_schema(dbclient.local.users.find())
 
-@router.get("/listfilter", response_model=List[User])
-async def get_users_by_ids(user_ids: List[int] = Query(...)):
-    
-    filtered_users = user_filter(filter_type="list", user_ids=user_ids)
-    return filtered_users
-
-@router.get("/rangefilter", response_model=List[User])
-async def get_users_by_range(start_id: int, end_id: int):
-    
-    filtered_users = user_filter(filter_type="range", start_id=start_id, end_id=end_id)
-    return filtered_users
+@router.get("/{id}")  # Path
+async def user(id: str):
+    return search_user("_id", ObjectId(id))
 
 # Method to add new users to the data_base file
 @router.post("/", response_model=User,status_code=201)
 async def create_user(user: User):
-    # Generate a new ID for the new user
-    new_user_id = max(user.id for user in user_list) + 1 if user_list else 1
-    user.id = new_user_id
-    
+    if type(search_user("email", user.email)) == User:
+        raise HTTPException(status_code= status.HTTP_409_CONFLICT, detail= "The user is already registered")
+
+    user_dict = dict(user)
+    del user_dict["id"]
+
     # Add the new user to user_list
-    user_list.append(user)
+    id = dbclient.local.users.insert_one(user_dict).inserted_id
+    new_user = user_schema(dbclient.local.users.find_one({"_id": id}))
     
-    return user
+    return new_user
 
 # PUT method to update user details
-@router.put("/{user_id}", response_model=User)
-async def update_user(user_id: int, user_data: dict):
-    for user in user_list:
-        if user.id == user_id:
-            for key, value in user_data.items():
-                setattr(user, key, value)
-            return user
-    
-    # If user_id not found, raise HTTPException with 404 Not Found
-    raise HTTPException(status_code=404, detail="User not found. No Update made")
+@router.put("/", response_model=User)
+async def update_user(user: User):
+    try:
+        user_dict = dict(user)
+        del user_dict["id"]
+        dbclient.local.users.find_one_and_replace({"_id": ObjectId(user.id)}, user_dict)
+    except:
+        # If user_id not found, raise HTTPException with 404 Not Found
+        raise HTTPException(status_code=404, detail="User not found. No Update made")
+    return search_user("_id", ObjectId(user.id))
 
-# DELETE method to erase users from user_db
+# DELETE method to erase users from MongoDB
 @router.delete("/")
-async def delete_users(user_ids: List[int] = Query(...)):
+async def delete_users(user_ids: List[str] = Query(...)):
     deleted_users = []
     for user_id in user_ids:
-        for user in user_list:
-            if user.id == user_id:
-                user_list.remove(user)
-                deleted_users.append(user)
-                break
-    
+        try:
+            object_id = ObjectId(user_id)
+        except Exception as e:
+            raise HTTPException(status_code=400, detail=f"Invalid ObjectId: {user_id}")
+
+        result = dbclient.local.users.find_one_and_delete({"_id": object_id})
+        if result:
+            deleted_users.append(user_schema(result))
+
     if not deleted_users:
         raise HTTPException(status_code=404, detail="No users found with the provided IDs")
     
     return {"message": "Users deleted successfully", "deleted_users": deleted_users}
+
+#--------------------- FUNCTIONS ---------------------#
+
+def search_user(field: str, key):
+    try:
+        user = dbclient.local.users.find_one({field: key})
+        return User(**user_schema(user))
+    except:
+        return {"error": "No se ha encontrado el usuario"}
