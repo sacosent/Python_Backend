@@ -1,5 +1,7 @@
 from fastapi import APIRouter
-from data_base import product_list
+from typing import List
+
+product_list: List = ["Product 1","Product 2"]
 
 router = APIRouter(prefix="/products",tags=["Products"])
 
