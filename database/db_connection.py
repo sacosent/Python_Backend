@@ -3,7 +3,7 @@
 from pymongo import MongoClient, server_api
 
 # Create a new client and connect to the server
-dbclient = MongoClient() # This connects to localhost
+dbclient = MongoClient().local # This connects to localhost
 
 #-------------- Base de datos remota MongoDB Atlas (https://mongodb.com) --------------#
 ## URI to connect to mongodb free server
